@@ -1,0 +1,22 @@
+# V10 Final Verification Checklist
+
+- [ ] flutter pub get
+- [ ] dart format --output=none .
+- [ ] flutter analyze
+- [ ] flutter test
+- [ ] flutter build apk --release
+- [ ] Install release APK on a device with MULTI_PROFILE support.
+- [ ] Create normal tab and private/incognito tab.
+- [ ] Set a cookie in normal tab; verify it is absent in private tab.
+- [ ] Set localStorage in normal tab; verify it is absent in private tab.
+- [ ] Create cacheable content in normal tab; verify private profile is separate.
+- [ ] Close private tab/profile and reopen it; verify private data is gone.
+- [ ] Verify private tabs are not present after app restart.
+- [ ] Verify a blocked host is intercepted by native request policy.
+- [ ] Verify a normal host remains loadable.
+- [ ] Start a large download, pause it, terminate app, reopen, and resume.
+- [ ] Verify HTTP Range is honored by a test server.
+- [ ] Verify AI stream cancellation and retry behavior.
+- [ ] Verify crash recovery records last URL/tab and recovers safely.
+- [ ] Verify tab groups/session restore exclude private tabs.
+- [ ] Verify release signing and privacy policy before publishing.

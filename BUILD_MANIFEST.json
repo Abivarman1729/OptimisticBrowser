@@ -1,0 +1,11 @@
+{
+  "dart_files": 17,
+  "dart_lines": 1374,
+  "embedded_file_markers": [],
+  "missing_relative_imports": [],
+  "brace_or_parenthesis_mismatches": [],
+  "flutter_compile_verified": false,
+  "flutter_compile_reason": "Flutter/Dart SDK is not available in this packaging environment; run flutter analyze/test locally.",
+  "recommended_build": true,
+  "known_source_fix": "Offline search fallback no longer opens DuckDuckGo; empty fallback URLs are non-clickable."
+}

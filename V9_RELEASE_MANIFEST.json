@@ -1,0 +1,30 @@
+{
+  "name": "Optimistic Browser",
+  "version": "10.0.0+1",
+  "stages": {
+    "stage1": "completed",
+    "stage2": "completed",
+    "stage3": "completed_source_hardening"
+  },
+  "engine": {
+    "android": "Chromium-backed Android System WebView",
+    "ios": "WKWebView/WebKit",
+    "bundledChromiumBinary": false
+  },
+  "privacy": {
+    "androidMultiProfile": true,
+    "privateTabsPersisted": false,
+    "privateProfileDeletion": true,
+    "networkInterception": true,
+    "contentBlocking": true
+  },
+  "productionHardening": {
+    "durableDownloads": true,
+    "httpRangeResume": true,
+    "aiCancellation": true,
+    "aiRetry": true,
+    "crashRecoveryMetadata": true,
+    "privateSessionPersistence": false
+  },
+  "compileVerification": "requires_flutter_environment"
+}

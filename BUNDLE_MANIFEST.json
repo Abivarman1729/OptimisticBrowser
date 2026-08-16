@@ -1,0 +1,12 @@
+{
+  "name": "Optimistic Browser Advanced Complete",
+  "version": "4.0.0",
+  "format": "tar.gz archive stored with .bin extension",
+  "architecture": "Flutter/Dart + Node.js gateway + Python AI + SQLite",
+  "line_count_strategy": "feature modules, not artificial 10000-30000 duplicate lines",
+  "search_policy": "native result cards; never redirect normal queries to Google or DuckDuckGo",
+  "security": "HTTP(S)-only navigation with blocked Google hosts and scheme validation",
+  "flutter_compile_verified_here": false,
+  "node_syntax_verified_here": true,
+  "python_compile_verified_here": true
+}

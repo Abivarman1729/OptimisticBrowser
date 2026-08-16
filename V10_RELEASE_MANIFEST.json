@@ -1,0 +1,31 @@
+{
+  "name": "Optimistic Browser",
+  "version": "10.0.0+1",
+  "release": "V10 Advanced Engine + Premium UI",
+  "architecture": {
+    "flutter_ui": "Flutter/Dart",
+    "flutter_controller": "webview_flutter 4.13.x",
+    "android_native_engine": "Kotlin + Android System WebView Chromium runtime",
+    "profile_isolation": "AndroidX WebKit MULTI_PROFILE",
+    "ai_backend": "Python",
+    "web_premium_ui": "HTML/CSS/JavaScript"
+  },
+  "engine": {
+    "primary_android": "Chromium-backed Android System WebView",
+    "cef_android": "unsupported_not_claimed",
+    "bundledChromiumBinary": false,
+    "reason": "CEF is a desktop embedding framework; V10 refuses to ship a misleading Android CEF binary."
+  },
+  "features": [
+    "true per-profile cookies/cache/local storage when MULTI_PROFILE is supported",
+    "private profile deletion",
+    "network interception",
+    "content blocking",
+    "navigation controls",
+    "hardened WebView settings",
+    "premium HTML/CSS controls",
+    "explicit engine capability reporting",
+    "AI kept in Python backend"
+  ],
+  "compileVerification": "host dependent; run tool/verify_v10.sh in a Flutter-enabled environment"
+}

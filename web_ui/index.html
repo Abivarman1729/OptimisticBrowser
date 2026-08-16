@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070A12">
+  <title>Optimistic Browser V10</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <main class="shell">
+    <header class="hero">
+      <div class="brand-mark">O</div>
+      <div><span class="eyebrow">V10 · PRIVATE AI BROWSER</span><h1>Optimistic Browser</h1>
+      <p>Fast navigation, isolated profiles, Chromium-backed Android runtime.</p></div>
+    </header>
+    <form id="searchForm" class="search glass">
+      <span class="search-icon">⌕</span>
+      <input id="query" autocomplete="off" placeholder="Search or enter a URL">
+      <button class="premium-btn" type="submit"><span>Search</span><kbd>↵</kbd></button>
+    </form>
+    <nav class="quick-actions" aria-label="Quick actions">
+      <button class="chip" data-action="new">＋ New tab</button>
+      <button class="chip" data-action="private">◈ Private profile</button>
+      <button class="chip" data-action="clear">⌫ Clear session</button>
+    </nav>
+    <section class="status glass"><span class="dot"></span><strong>Engine ready</strong><span id="engineStatus">Chromium Android System WebView · Multi-profile when supported</span></section>
+    <section id="results" class="results" aria-live="polite"></section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

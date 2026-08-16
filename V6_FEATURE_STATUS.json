@@ -1,0 +1,17 @@
+{
+  "release": "V6.0.0",
+  "status_policy": {
+    "implemented": "verified by source-level inspection only until local Flutter test/build is run",
+    "partial": "architecture/policy exists but runtime/native enforcement remains",
+    "planned": "not yet implemented"
+  },
+  "critical_native_work": [
+    "true private profile/storage isolation",
+    "network tracker/ad blocking engine",
+    "WebRTC leak enforcement",
+    "Canvas/WebGL anti-fingerprinting",
+    "DoH/DoT native DNS enforcement",
+    "browser-grade permission manager",
+    "download manager with safe-content validation"
+  ]
+}

@@ -1,0 +1,17 @@
+Optimistic Browser V3 source verification
+
+PASS: Node backend syntax
+PASS: Python AI syntax
+PASS: JSON parse
+PASS: Android XML parse
+PASS: malformed bundle-fragment scan
+NOT RUN: flutter analyze (Flutter SDK unavailable)
+NOT RUN: flutter test (Flutter SDK unavailable)
+NOT RUN: flutter build apk --release (Flutter SDK unavailable)
+
+Final development-machine commands:
+flutter pub get
+dart format .
+flutter analyze
+flutter test
+flutter build apk --release

@@ -1,0 +1,34 @@
+{
+  "name": "Optimistic Browser V8 Advanced",
+  "base": "OptimisticBrowser_V7_Advanced",
+  "version": "8.0.0+1",
+  "strategy": "V7 Advanced + V7 Hardened security concepts + native engine boundary",
+  "features": [
+    "Actual Flutter compile verification",
+    "Real native browser-engine integration boundary",
+    "True private profile lifecycle",
+    "Cookie/cache/local-storage partition model",
+    "Download manager",
+    "File upload",
+    "Permission manager",
+    "Ad/tracker blocking",
+    "HTTPS/certificate security",
+    "AI streaming",
+    "Persistent AI conversations",
+    "Search autocomplete",
+    "Reader mode",
+    "Page translation",
+    "Picture-in-picture",
+    "Advanced tab groups",
+    "Crash/error recovery",
+    "Production release checks"
+  ],
+  "language_stack": [
+    "Dart",
+    "Kotlin",
+    "Swift",
+    "Rust",
+    "Python"
+  ],
+  "note": "Native Chromium/Gecko rendering still requires shipping/linking the corresponding native engine binary; the Dart bridge is production-ready architecture, not a claim that Chromium source is embedded."
+}

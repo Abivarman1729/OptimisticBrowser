@@ -1,0 +1,15 @@
+{
+  "name": "OptimisticBrowser_V6_Complete_Engineering",
+  "base": "OptimisticBrowser_V5_1_Processed",
+  "version": "6.0.0+1",
+  "toolchain_lock": "toolchain.lock.json",
+  "bootstrap": [
+    "tooling/bootstrap_windows.ps1",
+    "tooling/bootstrap_unix.sh"
+  ],
+  "verification": [
+    "tooling/verify_environment.ps1",
+    "tooling/verify_environment.sh"
+  ],
+  "sdk_policy": "download-and-verify-at-bootstrap; do not embed third-party SDK binaries"
+}

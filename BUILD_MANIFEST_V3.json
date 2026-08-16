@@ -1,0 +1,273 @@
+{
+  "name": "OptimisticBrowser_Advanced_Remediated_V3",
+  "version": "5.0.0",
+  "generated": "2026-08-15",
+  "file_count": 53,
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "3aba03c57dcd42e77aac7c10bca3b5248faab0ab3408b512691341e1b5631b39",
+      "bytes": 224
+    },
+    {
+      "path": "FEATURE_MATRIX.md",
+      "sha256": "448987bf1220badd662be7e82c3c9899c2b04ddf12166eb74375519c65c4fc9f",
+      "bytes": 1550
+    },
+    {
+      "path": "FIXES_APPLIED.md",
+      "sha256": "1fd0ca8ca9db53e47e913ec9b7cbf582992a2187fcc21ef099c96b852c052878",
+      "bytes": 676
+    },
+    {
+      "path": "FIXES_APPLIED_V2.md",
+      "sha256": "795642a6596fb8023a5ac99e7a83052a80c61b4251a2abb968ad6b2764e0d73a",
+      "bytes": 2435
+    },
+    {
+      "path": "FIXES_APPLIED_V3.md",
+      "sha256": "1dbf7652d05b8cd1f924deb1c733e17db196f4d11d79adc73be263bcd9711923",
+      "bytes": 5609
+    },
+    {
+      "path": "README.md",
+      "sha256": "74fe053235dade39ccdfeed997b6b67b6f019989847e3ed872edcc1e698a9764",
+      "bytes": 2877
+    },
+    {
+      "path": "RUN_COMMANDS.txt",
+      "sha256": "743e9f93ee2e0f2fbafef91b2442d58988d811e476be1f589156d3a3fac18fd4",
+      "bytes": 418
+    },
+    {
+      "path": "VERIFICATION.md",
+      "sha256": "e4cd88d178c003733974cafc0982df50b5f5f1c385b5510806d33143f342787e",
+      "bytes": 991
+    },
+    {
+      "path": "VERIFICATION_V3.json",
+      "sha256": "56d4e264e930c11faed065ddbe7f18100232429c89d9472bce0e5d72fe7d583d",
+      "bytes": 1531
+    },
+    {
+      "path": "android/README.md",
+      "sha256": "02c5e2eea3bcd81589a9bc9930400dd1659f4e070c9df691ef54fe2b75860a74",
+      "bytes": 416
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "sha256": "2a9aa708f20bae13ca0d007d0147c71d1deabf42513d79ae409de1f9d799a504",
+      "bytes": 1241
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/optimistic/browser/MainActivity.kt",
+      "sha256": "2a0f00d7c35e994512486ecda14c6fceec40a657094871220cfff5065a68842d",
+      "bytes": 124
+    },
+    {
+      "path": "android/app/src/main/res/values/styles.xml",
+      "sha256": "78fbffe879b2cf62f89be535c08fcadfd6d4138b9f64606904546e63cb5c0c70",
+      "bytes": 347
+    },
+    {
+      "path": "android/app/src/main/res/xml/network_security_config.xml",
+      "sha256": "46c3730fc6647e728db3ab48a6615d3ee747466ad1a60fbc52c38a20ebb7e81d",
+      "bytes": 317
+    },
+    {
+      "path": "assets/branding/optimistic_browser_8k.png",
+      "sha256": "58b3474fcbcce9528a5c4aadfd6c0140cd95f0493203f28efa173bd37b3073ab",
+      "bytes": 443103
+    },
+    {
+      "path": "backend/.env.example",
+      "sha256": "02b8aa5b233178aa3db30d0fcb54c0043c80f93b67d7c145214b9878a02a96be",
+      "bytes": 73
+    },
+    {
+      "path": "backend/ai/main.py",
+      "sha256": "03cca5d443472a578fe9e5b57d2877373b2b51c4913c593daaac69917f066ef8",
+      "bytes": 4230
+    },
+    {
+      "path": "backend/ai/requirements.txt",
+      "sha256": "503948fdc113df4bc8e152215717c3a6ee77ab8bb60d4a13ec45bcfa73407dd7",
+      "bytes": 86
+    },
+    {
+      "path": "backend/package.json",
+      "sha256": "2eacbe3668212e93d873e1cc0eef0906a01941e514ee6db8466facfff5c4c41b",
+      "bytes": 110
+    },
+    {
+      "path": "backend/src/server.js",
+      "sha256": "c20083ffd74bbf3f2fb18cebb3ed06f08ece05ff4c6205f11582172cbf574ef4",
+      "bytes": 5671
+    },
+    {
+      "path": "lib/app.dart",
+      "sha256": "5e02b87278473510f6c5a6f58b9a7ca3c82686d6bf593fe1e106d14f3cf30b93",
+      "bytes": 4208
+    },
+    {
+      "path": "lib/core/config/app_config.dart",
+      "sha256": "3d88a6d61f9b83036d8a34486339e2a9b1ce0da92387a9865b010cac9e504f00",
+      "bytes": 407
+    },
+    {
+      "path": "lib/core/errors/app_error.dart",
+      "sha256": "d9ce1a483349e8e76c30446fa70f03266bf129cf4bc5d651a4d3cf1b5a08fee7",
+      "bytes": 409
+    },
+    {
+      "path": "lib/core/features/feature_registry.dart",
+      "sha256": "50ce4f3e9f29c33bf7c718a5323f52da2fc18c196e9b35b36fb33df52913b91c",
+      "bytes": 10572
+    },
+    {
+      "path": "lib/core/security/security_policy.dart",
+      "sha256": "e4075126541752aa5ce930bcadc58d60924fa816d43228ab83818444aecd706b",
+      "bytes": 475
+    },
+    {
+      "path": "lib/core/theme/app_theme.dart",
+      "sha256": "4e598255d85ae362321322e4144ce6ceee4f364281c7a4044e58918a6cce34f3",
+      "bytes": 1394
+    },
+    {
+      "path": "lib/core/utils/url_policy.dart",
+      "sha256": "023d0647264bee59a9f87664ed7d25ed86084cfe1fba31887f64b9bb8855e6f0",
+      "bytes": 1419
+    },
+    {
+      "path": "lib/data/local/app_database.dart",
+      "sha256": "1ecc035cbea6d41b483aba52a903ccdcf93ef2880f5c41fb7a327020ae4d8cbd",
+      "bytes": 1917
+    },
+    {
+      "path": "lib/data/local/local_repository.dart",
+      "sha256": "ec0d54f6a7b47e1081cc26dc30ac8a290db9f0ed4d93ae8372a4288bb1bbc2f1",
+      "bytes": 3346
+    },
+    {
+      "path": "lib/features/ai/ai_page.dart",
+      "sha256": "0110469377f94ba6a07ed0f0c558d01a3b3f524305517301fc74e6a2c4524444",
+      "bytes": 5976
+    },
+    {
+      "path": "lib/features/browser/browser_controller.dart",
+      "sha256": "c26f57a3fa04f9177c6a76871f0508b9b038a2f331ee36d1c7446b3fe6d45ef4",
+      "bytes": 10577
+    },
+    {
+      "path": "lib/features/browser/browser_page.dart",
+      "sha256": "09115f9929db86a793a59833a54665904e686b26d84526c593a12cedfe042cdb",
+      "bytes": 18086
+    },
+    {
+      "path": "lib/features/browser/models/browser_tab.dart",
+      "sha256": "1a4847b544ce41eecbf036dee346876eafff1fe0e4686c25c851645795b8e1c7",
+      "bytes": 1064
+    },
+    {
+      "path": "lib/features/browser/tab_manager.dart",
+      "sha256": "4e0a81a1fd7de83823474d05ea835d82db40c68d74f9108483aa968682248081",
+      "bytes": 1986
+    },
+    {
+      "path": "lib/features/home/home_page.dart",
+      "sha256": "7ffe39fd8613bbf9fcdeac7c3b971906ec027aa4cf72d910b882401f87402d36",
+      "bytes": 3988
+    },
+    {
+      "path": "lib/features/library/library_page.dart",
+      "sha256": "dbabc0aacac9bc7cbdc0e8152e2a12a0b2c94f883287f4c06caf0d42c33e931a",
+      "bytes": 3452
+    },
+    {
+      "path": "lib/features/notebook/notebook_page.dart",
+      "sha256": "23b065b0340293c25879cafc739cb7eca3984ebdbc64a714ffe73ffe26cfafbd",
+      "bytes": 4723
+    },
+    {
+      "path": "lib/features/settings/settings_page.dart",
+      "sha256": "c48d86ea3cdbc0188267f9a13ab9a4a7feb06a7e9c4e699b634b70f3f17cfec3",
+      "bytes": 3690
+    },
+    {
+      "path": "lib/main.dart",
+      "sha256": "7e337d9dcff77301ff2e8706f14f4f4d97c504d6d75f40240fc768b945f458da",
+      "bytes": 170
+    },
+    {
+      "path": "lib/services/ai/ai_models.dart",
+      "sha256": "a9ef566abd2915cefdac67365a740662a12aefac3d8058f8eb1da77f2db20b3c",
+      "bytes": 406
+    },
+    {
+      "path": "lib/services/ai/ai_service.dart",
+      "sha256": "163bae407d5cd789ace7b2c3c01584713198833c8b31c9288c83a33c96e64d28",
+      "bytes": 1817
+    },
+    {
+      "path": "lib/services/privacy/privacy_service.dart",
+      "sha256": "7e3b397ce5d7b0baeff5c8a76cb23bb0fff264b5f81fd11543faceaccf5695d5",
+      "bytes": 1720
+    },
+    {
+      "path": "lib/services/search/search_models.dart",
+      "sha256": "dafb38b14ed62541f41b2cfac8913e28d9a100cf035b439cc0f970a3a832d182",
+      "bytes": 296
+    },
+    {
+      "path": "lib/services/search/search_service.dart",
+      "sha256": "6a11cc3a4d2e272c145193b9da0c3aabbcc753683858707eb7c9760bca0cd0e9",
+      "bytes": 1761
+    },
+    {
+      "path": "lib/widgets/optimistic_logo.dart",
+      "sha256": "0cc25983b46561cc2ef3c07879bbfa83b4e36be4192c7db4b0438fec8b2d7179",
+      "bytes": 499
+    },
+    {
+      "path": "pubspec.yaml",
+      "sha256": "99915f4ab7d23125525f20f796a789577a440e5916bd7b98f07f5d74903957fd",
+      "bytes": 744
+    },
+    {
+      "path": "test/feature_registry_test.dart",
+      "sha256": "eee0a502e85526248ef06b618a5fb9b3486edad1432753205d151a0f5f81d49e",
+      "bytes": 637
+    },
+    {
+      "path": "test/search_test.dart",
+      "sha256": "3c1abd19fc616bdb793c4b77eeccac9833cc127bdfa6e313307d9aa36c502a3e",
+      "bytes": 274
+    },
+    {
+      "path": "test/tab_manager_test.dart",
+      "sha256": "2520de2b673ce83ed17b3eda4983d0690c210574a888bfe68bf6dfa02ce8625f",
+      "bytes": 1053
+    },
+    {
+      "path": "test/url_policy_test.dart",
+      "sha256": "00535d757344af8e5f675de7a0dc82cfaba9794314b05a9ccba2521f29f5910d",
+      "bytes": 1095
+    },
+    {
+      "path": "web_ui/app.js",
+      "sha256": "5bded6df79dfe28a5a78570c5d83833c05bfd583387d82935b82035f7d33b591",
+      "bytes": 908
+    },
+    {
+      "path": "web_ui/index.html",
+      "sha256": "b02fa45c0e1247efecf9ca81dcc8b588f1a70397fa9934abfa416cee34b1e24d",
+      "bytes": 772
+    },
+    {
+      "path": "web_ui/styles.css",
+      "sha256": "d9e031f0d98646ab5f763610e8b46743ae7f14f2258e639415a1345f4a1c34fe",
+      "bytes": 765
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "project": "Optimistic Browser",
+  "base": "V7 Hardened",
+  "version": "7.1.0+2",
+  "upgrade": "Advanced Engine-Ready + Compile Verification",
+  "added": [
+    "BrowserEngine contract",
+    "EngineCapabilities capability gate",
+    "WebViewBrowserEngine adapter",
+    "Flutter analyze/test/release APK verification scripts",
+    "Browser engine contract test",
+    "Deterministic awaited browser initialization",
+    "Engine readiness documentation"
+  ],
+  "compile_verification": {
+    "status": "not_run",
+    "reason": "Flutter SDK is not installed in the packaging environment"
+  },
+  "production_engine": {
+    "status": "engine-ready architecture, not a replacement native browser engine",
+    "reason": "webview_flutter public API does not provide per-profile cookie/cache/local-storage isolation"
+  }
+}
