@@ -18,10 +18,30 @@ class GeckoEngine(context: Context) {
     private var session: GeckoSession? = null
     private var geckoView: GeckoView? = null
 
+    private var canNavigateBack = false
+    private var canNavigateForward = false
+
     fun createView(): View {
         val view = GeckoView(appContext)
 
         val newSession = GeckoSession()
+
+        newSession.navigationDelegate = object : GeckoSession.NavigationDelegate {
+
+            override fun onCanGoBack(
+                session: GeckoSession,
+                canGoBack: Boolean
+            ) {
+                canNavigateBack = canGoBack
+            }
+
+            override fun onCanGoForward(
+                session: GeckoSession,
+                canGoForward: Boolean
+            ) {
+                canNavigateForward = canGoForward
+            }
+        }
 
         newSession.open(runtime)
 
@@ -51,21 +71,33 @@ class GeckoEngine(context: Context) {
     }
 
     fun goBack(): Boolean {
-        return if (session?.canGoBack == true) {
-            session?.goBack()
-            true
-        } else {
-            false
+        val currentSession = session ?: return false
+
+        if (!canNavigateBack) {
+            return false
         }
+
+        currentSession.goBack()
+        return true
     }
 
     fun goForward(): Boolean {
-        return if (session?.canGoForward == true) {
-            session?.goForward()
-            true
-        } else {
-            false
+        val currentSession = session ?: return false
+
+        if (!canNavigateForward) {
+            return false
         }
+
+        currentSession.goForward()
+        return true
+    }
+
+    fun canGoBack(): Boolean {
+        return canNavigateBack
+    }
+
+    fun canGoForward(): Boolean {
+        return canNavigateForward
     }
 
     fun reload() {
@@ -80,5 +112,8 @@ class GeckoEngine(context: Context) {
         session?.close()
         session = null
         geckoView = null
+
+        canNavigateBack = false
+        canNavigateForward = false
     }
 }
