@@ -173,27 +173,19 @@ class OptimisticBrowserController extends ChangeNotifier {
   Future<void> openInput(String input) async {
     final value = input.trim();
     if (value.isEmpty) return;
+
     _lastError = null;
 
+    // Direct URL
     if (UrlPolicy.looksLikeUrl(value)) {
       await _loadUrl(UrlPolicy.resolveDirectUrl(value));
       return;
     }
 
-    _loading = true;
-    _lastSearchQuery = value;
-    _results = const [];
-    notifyListeners();
-    try {
-      _results = await const SearchService().search(value, category: _searchCategory);
-    } on AppError catch (error) {
-      _lastError = error;
-    } catch (error) {
-      _lastError = AppError(AppErrorType.searchProvider, '$error');
-    } finally {
-      _loading = false;
-      notifyListeners();
-    }
+    // Search query → Brave Search
+    final searchUrl = Uri.https('search.brave.com', '/search', {'q': value});
+
+    await _loadUrl(searchUrl);
   }
 
   Future<void> openResult(String url) => _loadUrl(UrlPolicy.resolveDirectUrl(url));

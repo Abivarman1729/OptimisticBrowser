@@ -44,7 +44,7 @@ flutter {
     source = "../.."
 }
 
-dependencies { 
-
-implementation("androidx.webkit:webkit:1.15.0")
+dependencies {
+    implementation("androidx.webkit:webkit:1.15.0")
+    implementation("org.mozilla.geckoview:geckoview:155.0.20260728095222")
 }
