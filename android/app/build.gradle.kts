@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.optimistic_browser"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.optimistic_browser"
-        minSdk = flutter.minSdkVersion
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
