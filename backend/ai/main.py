@@ -1,9 +1,13 @@
 import os
 from typing import Any
 
-import httpx
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+try:
+    import httpx  # type: ignore[import-not-found]
+except ImportError:
+    raise ImportError("httpx is required. Install it with: pip install httpx")
+
+from fastapi import FastAPI, HTTPException  # type: ignore[import-not-found]
+from pydantic import BaseModel, Field  # type: ignore[import-not-found]
 
 app = FastAPI(title="Optimistic AI", version="3.0.0")
 
@@ -87,7 +91,7 @@ async def remote_answer(request: AskRequest) -> str:
         )
     try:
         data: Any = response.json()
-    except Exception:
+    except ValueError:
         data = {}
     if response.status_code >= 400:
         raise HTTPException(status_code=response.status_code, detail={"type": "ai_provider", "message": "AI provider error."})
