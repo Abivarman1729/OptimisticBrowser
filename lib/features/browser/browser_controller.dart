@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/errors/app_error.dart';
 import '../../core/utils/url_policy.dart';
 import '../../data/local/local_repository.dart';
@@ -480,10 +481,11 @@ class OptimisticBrowserController extends ChangeNotifier {
       return;
     }
 
-    if (value.length > 500) {
-      _lastError = const AppError(
+    if (value.length > AppConfig.maxSearchLength) {
+      _lastError = AppError(
         AppErrorType.validation,
-        'Search query is too long.',
+        'Search query is too long. Maximum length is '
+        '${AppConfig.maxSearchLength} characters.',
       );
 
       _notifySafely();
@@ -593,6 +595,7 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     if (UrlPolicy.looksLikeUrl(value)) {
       _lastSearchQuery = '';
+
       _searchGeneration++;
 
       try {
@@ -698,6 +701,8 @@ class OptimisticBrowserController extends ChangeNotifier {
         title: active.title,
         loading: false,
       );
+
+      _notifySafely();
 
       return;
     }
