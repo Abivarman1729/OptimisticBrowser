@@ -18,20 +18,16 @@ class OptimisticBrowserController extends ChangeNotifier {
     _createInitialTab();
   }
 
-  // ===========================================================================
-  // CORE DEPENDENCIES
-  // ===========================================================================
-
   final LocalRepository _repository = const LocalRepository();
+
   final PrivacyService _privacy = const PrivacyService();
+
+  final SearchService _searchService = const SearchService();
+
   final TabManager tabs = TabManager();
 
   final Map<String, WebViewController> _webViews =
       <String, WebViewController>{};
-
-  // ===========================================================================
-  // STATE
-  // ===========================================================================
 
   String _currentUrl = '';
   String _title = 'Optimistic Browser';
@@ -41,7 +37,8 @@ class OptimisticBrowserController extends ChangeNotifier {
 
   List<SearchResult> _results = const <SearchResult>[];
 
-  final String _searchCategory = 'web';
+  String _searchCategory = 'web';
+
   String _lastSearchQuery = '';
 
   AppError? _lastError;
@@ -50,10 +47,13 @@ class OptimisticBrowserController extends ChangeNotifier {
   bool _disposed = false;
 
   int _navigationGeneration = 0;
+  int _searchGeneration = 0;
 
-  // ===========================================================================
+  DateTime? _lastSearchCompletedAt;
+
+  // ---------------------------------------------------------------------------
   // GETTERS
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
 
   WebViewController get webView {
     final BrowserTab? active = tabs.active;
@@ -87,9 +87,19 @@ class OptimisticBrowserController extends ChangeNotifier {
 
   AppError? get lastError => _lastError;
 
-  // ===========================================================================
-  // TAB LOOKUP
-  // ===========================================================================
+  bool get hasSearchResults => _results.isNotEmpty;
+
+  bool get hasSearchQuery => _lastSearchQuery.isNotEmpty;
+
+  int get searchResultCount => _results.length;
+
+  DateTime? get lastSearchCompletedAt => _lastSearchCompletedAt;
+
+  bool get isSearchLoading => _loading && _lastSearchQuery.isNotEmpty;
+
+  // ---------------------------------------------------------------------------
+  // TAB HELPERS
+  // ---------------------------------------------------------------------------
 
   BrowserTab? _findTab(String tabId) {
     for (final BrowserTab tab in tabs.tabs) {
@@ -101,10 +111,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     return null;
   }
 
-  // ===========================================================================
-  // INITIAL TAB
-  // ===========================================================================
-
   void _createInitialTab() {
     final BrowserTab tab = tabs.create();
 
@@ -113,9 +119,9 @@ class OptimisticBrowserController extends ChangeNotifier {
     _syncActive(notify: false);
   }
 
-  // ===========================================================================
-  // WEBVIEW CREATION
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // WEBVIEW
+  // ---------------------------------------------------------------------------
 
   WebViewController _makeWebView(String tabId) {
     late final WebViewController controller;
@@ -124,23 +130,12 @@ class OptimisticBrowserController extends ChangeNotifier {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          // -------------------------------------------------------------------
-          // PAGE STARTED
-          // -------------------------------------------------------------------
           onPageStarted: (String url) {
             _pageState(tabId: tabId, url: url, title: '', loading: true);
           },
-
-          // -------------------------------------------------------------------
-          // PAGE FINISHED
-          // -------------------------------------------------------------------
           onPageFinished: (String url) {
             unawaited(_pageFinished(tabId, url));
           },
-
-          // -------------------------------------------------------------------
-          // WEB RESOURCE ERROR
-          // -------------------------------------------------------------------
           onWebResourceError: (WebResourceError error) {
             final bool mainFrame = error.isForMainFrame ?? true;
 
@@ -161,51 +156,31 @@ class OptimisticBrowserController extends ChangeNotifier {
 
             _notifySafely();
           },
-
-          // -------------------------------------------------------------------
-          // NAVIGATION REQUEST
-          // -------------------------------------------------------------------
           onNavigationRequest: (NavigationRequest request) {
             final String requestedUrl = request.url.trim();
 
-            if (requestedUrl.isEmpty) {
-              _setNavigationBlockedError();
-
-              return NavigationDecision.prevent;
-            }
-
             final Uri? uri = Uri.tryParse(requestedUrl);
 
-            if (uri == null) {
+            if (requestedUrl.isEmpty || uri == null) {
               _setNavigationBlockedError();
-
               return NavigationDecision.prevent;
             }
 
-            // Do not allow unsupported schemes.
             if (!UrlPolicy.isHttp(uri)) {
               _setNavigationBlockedError();
-
               return NavigationDecision.prevent;
             }
 
-            // Respect browser security policy.
             if (UrlPolicy.isBlocked(uri)) {
               _setNavigationBlockedError();
-
               return NavigationDecision.prevent;
             }
-
-            // -----------------------------------------------------------------
-            // HTTP -> HTTPS UPGRADE
-            // -----------------------------------------------------------------
 
             if (uri.scheme.toLowerCase() == 'http') {
               final Uri secureUri = uri.replace(scheme: 'https');
 
               if (!UrlPolicy.isSafeNavigation(secureUri)) {
                 _setNavigationBlockedError();
-
                 return NavigationDecision.prevent;
               }
 
@@ -221,10 +196,6 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     return controller;
   }
-
-  // ===========================================================================
-  // PAGE FINISHED
-  // ===========================================================================
 
   Future<void> _pageFinished(String tabId, String url) async {
     final BrowserTab? tab = _findTab(tabId);
@@ -248,31 +219,19 @@ class OptimisticBrowserController extends ChangeNotifier {
         if (parsedTitle.trim().isNotEmpty) {
           pageTitle = parsedTitle.trim();
         }
-      } catch (_) {
-        // Title extraction failure must never break navigation.
-      }
+      } catch (_) {}
     }
 
     _pageState(tabId: tabId, url: url, title: pageTitle, loading: false);
 
-    // -------------------------------------------------------------------------
-    // PRIVATE TABS NEVER ENTER HISTORY
-    // -------------------------------------------------------------------------
-
     if (tab.mode == BrowserTabMode.normal && url.trim().isNotEmpty) {
       try {
         await _repository.addHistory(title: pageTitle, url: url);
-      } catch (_) {
-        // History failure must never crash browser navigation.
-      }
+      } catch (_) {}
 
       await persistSession();
     }
   }
-
-  // ===========================================================================
-  // PAGE STATE
-  // ===========================================================================
 
   void _pageState({
     required String tabId,
@@ -305,10 +264,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     _notifySafely();
   }
 
-  // ===========================================================================
-  // LOADING STATE
-  // ===========================================================================
-
   void _setLoadingForTab(String tabId, bool loading) {
     final BrowserTab? tab = _findTab(tabId);
 
@@ -323,20 +278,14 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // NAVIGATION ERROR
-  // ===========================================================================
-
   void _setNavigationBlockedError() {
     _lastError = const AppError(
       AppErrorType.navigationBlocked,
       'Navigation was blocked by the browser security policy.',
     );
-  }
 
-  // ===========================================================================
-  // ACTIVE TAB SYNC
-  // ===========================================================================
+    _notifySafely();
+  }
 
   void _syncActive({bool notify = true}) {
     final BrowserTab? active = tabs.active;
@@ -367,21 +316,15 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // SAFE NOTIFY
-  // ===========================================================================
-
   void _notifySafely() {
-    if (_disposed) {
-      return;
+    if (!_disposed) {
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
-  // ===========================================================================
-  // INITIALIZE SESSION
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // SESSION
+  // ---------------------------------------------------------------------------
 
   Future<void> initialize() async {
     if (_initialized) {
@@ -424,13 +367,10 @@ class OptimisticBrowserController extends ChangeNotifier {
 
           final BrowserTab tab = BrowserTab.fromJson(item);
 
-          // Private tabs must never be restored.
           if (tab.mode == BrowserTabMode.normal) {
             savedTabs.add(tab);
           }
-        } catch (_) {
-          // Ignore a corrupted individual tab.
-        }
+        } catch (_) {}
       }
 
       if (savedTabs.isEmpty) {
@@ -471,22 +411,14 @@ class OptimisticBrowserController extends ChangeNotifier {
 
       _syncActive();
     } catch (_) {
-      // Corrupted session data must never
-      // prevent the browser from starting.
-
       _syncActive();
     }
   }
-
-  // ===========================================================================
-  // PERSIST SESSION
-  // ===========================================================================
 
   Future<void> persistSession() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      // Only normal tabs are persisted.
       final List<BrowserTab> normalTabs = tabs.tabs
           .where((BrowserTab tab) => tab.mode == BrowserTabMode.normal)
           .toList();
@@ -507,14 +439,148 @@ class OptimisticBrowserController extends ChangeNotifier {
       };
 
       await prefs.setString('optimistic.session', jsonEncode(data));
-    } catch (_) {
-      // Persistence must never crash the browser.
+    } catch (_) {}
+  }
+
+  // ---------------------------------------------------------------------------
+  // SEARCH
+  // ---------------------------------------------------------------------------
+
+  void setSearchCategory(String category) {
+    const Set<String> allowed = <String>{
+      'web',
+      'images',
+      'videos',
+      'news',
+      'shopping',
+    };
+
+    final String value = category.trim().toLowerCase();
+
+    if (!allowed.contains(value) || value == _searchCategory) {
+      return;
+    }
+
+    _searchCategory = value;
+
+    final String query = _lastSearchQuery.trim();
+
+    _notifySafely();
+
+    if (query.isNotEmpty) {
+      unawaited(search(query));
     }
   }
 
-  // ===========================================================================
-  // ADDRESS BAR / SEARCH INPUT
-  // ===========================================================================
+  Future<void> search(String query, {bool forceRefresh = false}) async {
+    final String value = query.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    if (value.isEmpty) {
+      clearSearchResults();
+      return;
+    }
+
+    if (value.length > 500) {
+      _lastError = const AppError(
+        AppErrorType.validation,
+        'Search query is too long.',
+      );
+
+      _notifySafely();
+      return;
+    }
+
+    final int generation = ++_searchGeneration;
+
+    _lastSearchQuery = value;
+
+    _lastError = null;
+
+    _loading = true;
+
+    // Results from a previous query must not
+    // remain visible during a new search.
+    _results = const <SearchResult>[];
+
+    _notifySafely();
+
+    try {
+      final List<SearchResult> results = await _searchService.search(
+        value,
+        category: _searchCategory,
+        forceRefresh: forceRefresh,
+      );
+
+      if (_disposed || generation != _searchGeneration) {
+        return;
+      }
+
+      _results = List<SearchResult>.unmodifiable(results);
+
+      _loading = false;
+
+      _lastSearchCompletedAt = DateTime.now();
+
+      if (_results.isEmpty) {
+        _lastError = const AppError(
+          AppErrorType.searchProvider,
+          'No search results were found.',
+        );
+      }
+    } on AppError catch (error) {
+      if (_disposed || generation != _searchGeneration) {
+        return;
+      }
+
+      _results = const <SearchResult>[];
+
+      _loading = false;
+
+      _lastError = error;
+    } catch (error) {
+      if (_disposed || generation != _searchGeneration) {
+        return;
+      }
+
+      _results = const <SearchResult>[];
+
+      _loading = false;
+
+      _lastError = AppError(
+        AppErrorType.network,
+        'Search failed. Please try again.',
+        cause: error,
+      );
+    }
+
+    _notifySafely();
+  }
+
+  Future<void> retrySearch() async {
+    final String query = _lastSearchQuery.trim();
+
+    if (query.isEmpty) {
+      return;
+    }
+
+    await search(query, forceRefresh: true);
+  }
+
+  void clearSearchResults() {
+    _searchGeneration++;
+
+    _results = const <SearchResult>[];
+
+    _lastSearchQuery = '';
+
+    _lastError = null;
+
+    _loading = false;
+
+    _lastSearchCompletedAt = null;
+
+    _notifySafely();
+  }
 
   Future<void> openInput(String input) async {
     final String value = input.trim();
@@ -524,13 +590,11 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
 
     _lastError = null;
-    _lastSearchQuery = '';
-
-    // -------------------------------------------------------------------------
-    // DIRECT URL
-    // -------------------------------------------------------------------------
 
     if (UrlPolicy.looksLikeUrl(value)) {
+      _lastSearchQuery = '';
+      _searchGeneration++;
+
       try {
         final Uri directUri = UrlPolicy.resolveDirectUrl(value);
 
@@ -544,28 +608,16 @@ class OptimisticBrowserController extends ChangeNotifier {
       return;
     }
 
-    // -------------------------------------------------------------------------
-    // SEARCH QUERY
-    // -------------------------------------------------------------------------
-
-    _lastSearchQuery = value;
-
-    final Uri searchUrl = Uri.https(
-      'search.brave.com',
-      '/search',
-      <String, String>{'q': value},
-    );
-
-    await _loadUrl(searchUrl);
+    await search(value);
   }
-
-  // ===========================================================================
-  // OPEN SEARCH RESULT
-  // ===========================================================================
 
   Future<void> openResult(String url) async {
     try {
       final Uri uri = UrlPolicy.resolveDirectUrl(url);
+
+      _lastSearchQuery = '';
+
+      _searchGeneration++;
 
       await _loadUrl(uri);
     } catch (error) {
@@ -575,9 +627,9 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // CORE URL LOADER
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // URL LOAD
+  // ---------------------------------------------------------------------------
 
   Future<void> _loadUrl(
     Uri uri, {
@@ -590,7 +642,6 @@ class OptimisticBrowserController extends ChangeNotifier {
       );
 
       _notifySafely();
-
       return;
     }
 
@@ -603,7 +654,6 @@ class OptimisticBrowserController extends ChangeNotifier {
       );
 
       _notifySafely();
-
       return;
     }
 
@@ -617,13 +667,13 @@ class OptimisticBrowserController extends ChangeNotifier {
       );
 
       _notifySafely();
-
       return;
     }
 
     final int generation = ++_navigationGeneration;
 
     _lastError = null;
+
     _results = const <SearchResult>[];
 
     _pageState(
@@ -652,10 +702,6 @@ class OptimisticBrowserController extends ChangeNotifier {
       return;
     }
 
-    // IMPORTANT:
-    // Do not force loading=false here.
-    // WebView callbacks control actual page loading state.
-
     if (generation != _navigationGeneration) {
       return;
     }
@@ -666,15 +712,14 @@ class OptimisticBrowserController extends ChangeNotifier {
       _currentUrl = uri.toString();
     }
 
-    // Private tabs are never persisted.
     if (active.mode == BrowserTabMode.normal) {
       await persistSession();
     }
   }
 
-  // ===========================================================================
-  // NEW TAB
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // TABS
+  // ---------------------------------------------------------------------------
 
   Future<void> newTab({bool private = false, String url = ''}) async {
     final BrowserTab tab = tabs.create(
@@ -685,10 +730,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     final WebViewController controller = _makeWebView(tab.id);
 
     _webViews[tab.id] = controller;
-
-    // -------------------------------------------------------------------------
-    // PRIVATE SESSION
-    // -------------------------------------------------------------------------
 
     if (private) {
       _incognito = true;
@@ -705,11 +746,13 @@ class OptimisticBrowserController extends ChangeNotifier {
       _incognito = false;
     }
 
-    _syncActive();
+    _lastSearchQuery = '';
 
-    // -------------------------------------------------------------------------
-    // OPTIONAL INITIAL URL
-    // -------------------------------------------------------------------------
+    _searchGeneration++;
+
+    _results = const <SearchResult>[];
+
+    _syncActive();
 
     final String cleanUrl = url.trim();
 
@@ -723,10 +766,6 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     await persistSession();
   }
-
-  // ===========================================================================
-  // SELECT TAB
-  // ===========================================================================
 
   Future<void> selectTab(String id) async {
     final BrowserTab? selected = _findTab(id);
@@ -742,10 +781,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     await persistSession();
   }
 
-  // ===========================================================================
-  // CLOSE TAB
-  // ===========================================================================
-
   Future<void> closeTab(String id) async {
     final BrowserTab? tab = _findTab(id);
 
@@ -758,9 +793,7 @@ class OptimisticBrowserController extends ChangeNotifier {
     if (tab.mode == BrowserTabMode.private && controller != null) {
       try {
         await _privacy.endPrivateSession(controller);
-      } catch (_) {
-        // Cleanup failure must not prevent tab closure.
-      }
+      } catch (_) {}
     }
 
     tabs.close(id);
@@ -772,14 +805,16 @@ class OptimisticBrowserController extends ChangeNotifier {
       return;
     }
 
+    _lastSearchQuery = '';
+
+    _searchGeneration++;
+
+    _results = const <SearchResult>[];
+
     _syncActive();
 
     await persistSession();
   }
-
-  // ===========================================================================
-  // REOPEN LAST CLOSED TAB
-  // ===========================================================================
 
   Future<void> reopenLastClosed() async {
     final BrowserTab? tab = tabs.reopenLastClosed();
@@ -788,7 +823,6 @@ class OptimisticBrowserController extends ChangeNotifier {
       return;
     }
 
-    // Never reopen private browsing sessions.
     if (tab.mode == BrowserTabMode.private) {
       _syncActive();
       return;
@@ -821,9 +855,9 @@ class OptimisticBrowserController extends ChangeNotifier {
     await persistSession();
   }
 
-  // ===========================================================================
-  // PAGE TEXT
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // PAGE UTILITIES
+  // ---------------------------------------------------------------------------
 
   Future<String> pageText() async {
     try {
@@ -839,10 +873,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // JAVASCRIPT VALUE DECODER
-  // ===========================================================================
-
   String _decodeJavaScriptValue(Object? value) {
     if (value == null) {
       return '';
@@ -850,8 +880,6 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     String result = value.toString();
 
-    // webview_flutter can return JSON
-    // encoded strings from JS evaluation.
     if (result.length >= 2 && result.startsWith('"') && result.endsWith('"')) {
       try {
         final dynamic decoded = jsonDecode(result);
@@ -866,10 +894,6 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     return result.replaceAll(r'\"', '"').replaceAll(r'\n', '\n').trim();
   }
-
-  // ===========================================================================
-  // EXTERNAL PAGE STATE
-  // ===========================================================================
 
   void setPageState({
     required String url,
@@ -895,17 +919,11 @@ class OptimisticBrowserController extends ChangeNotifier {
     _notifySafely();
   }
 
-  // ===========================================================================
-  // BACK
-  // ===========================================================================
-
   Future<void> goBack() async {
     try {
       final WebViewController controller = webView;
 
-      final bool canGoBack = await controller.canGoBack();
-
-      if (canGoBack) {
+      if (await controller.canGoBack()) {
         await controller.goBack();
       }
     } catch (error) {
@@ -915,17 +933,11 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // FORWARD
-  // ===========================================================================
-
   Future<void> goForward() async {
     try {
       final WebViewController controller = webView;
 
-      final bool canGoForward = await controller.canGoForward();
-
-      if (canGoForward) {
+      if (await controller.canGoForward()) {
         await controller.goForward();
       }
     } catch (error) {
@@ -934,10 +946,6 @@ class OptimisticBrowserController extends ChangeNotifier {
       _notifySafely();
     }
   }
-
-  // ===========================================================================
-  // RELOAD
-  // ===========================================================================
 
   Future<void> reload() async {
     try {
@@ -949,16 +957,11 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // BOOKMARK
-  // ===========================================================================
-
   Future<void> bookmarkCurrentPage() async {
     if (_currentUrl.trim().isEmpty) {
       return;
     }
 
-    // Private pages must never be bookmarked.
     if (_incognito) {
       return;
     }
@@ -972,10 +975,6 @@ class OptimisticBrowserController extends ChangeNotifier {
     }
   }
 
-  // ===========================================================================
-  // PRIVATE DATA
-  // ===========================================================================
-
   Future<void> clearPrivateData() async {
     if (!_incognito) {
       _lastError = const AppError(
@@ -984,17 +983,9 @@ class OptimisticBrowserController extends ChangeNotifier {
       );
 
       _notifySafely();
-
       return;
     }
 
-    // IMPORTANT:
-    //
-    // Do not clear global WebView cookies/cache/storage.
-    // webview_flutter public APIs do not provide isolated
-    // per-tab persistent profiles.
-    //
-    // Clearing global data could affect normal tabs.
     _lastError = const AppError(
       AppErrorType.permission,
       'Private history/session persistence is isolated. '
@@ -1004,22 +995,6 @@ class OptimisticBrowserController extends ChangeNotifier {
 
     _notifySafely();
   }
-
-  // ===========================================================================
-  // SEARCH STATE
-  // ===========================================================================
-
-  void clearSearchResults() {
-    _results = const <SearchResult>[];
-
-    _lastSearchQuery = '';
-
-    _notifySafely();
-  }
-
-  // ===========================================================================
-  // ERROR STATE
-  // ===========================================================================
 
   void clearError() {
     if (_lastError == null) {
@@ -1031,15 +1006,13 @@ class OptimisticBrowserController extends ChangeNotifier {
     _notifySafely();
   }
 
-  // ===========================================================================
-  // DISPOSE
-  // ===========================================================================
-
   @override
   void dispose() {
     _disposed = true;
 
-    // Persist only normal tabs.
+    _searchGeneration++;
+    _navigationGeneration++;
+
     unawaited(persistSession());
 
     super.dispose();
