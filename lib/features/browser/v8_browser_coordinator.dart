@@ -63,8 +63,9 @@ class V8BrowserCoordinator {
 
   Future<void> activateProfile(String profileId) async {
     final profile = profiles.get(profileId);
-    if (profile == null)
+    if (profile == null) {
       throw StateError('Unknown browser profile: $profileId');
+    }
     await engine.createProfile(
       profileId: profileId,
       mode: profile.isPrivate
