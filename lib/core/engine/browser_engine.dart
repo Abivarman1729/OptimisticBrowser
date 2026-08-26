@@ -1,21 +1,58 @@
 import 'engine_capabilities.dart';
 
-/// Contract between the Flutter browser shell and the underlying web engine.
+/// Contract between the Flutter browser shell and the native browser engine.
 ///
-/// The current implementation is backed by platform WebView. The interface
-/// deliberately keeps engine-specific capabilities out of UI code so a
-/// production engine such as a native Chromium/Gecko profile backend can be
-/// introduced without rewriting tabs, history, AI, library, or notebook code.
+/// The UI and higher-level browser services must depend only on this
+/// abstraction. Platform-specific implementation details belong behind the
+/// engine boundary.
 abstract interface class BrowserEngine {
+  /// Describes the capabilities exposed by the active engine implementation.
   EngineCapabilities get capabilities;
 
+  /// Whether the native engine has completed initialization.
+  bool get initialized;
+
+  /// Currently active engine profile identifier.
+  String get profileId;
+
+  /// Currently active profile mode.
+  EngineProfileMode get mode;
+
+  /// Initializes the native engine bridge.
   Future<void> initialize();
 
-  /// Returns whether a navigation can be admitted by the engine layer.
+  /// Creates or switches to an engine profile.
+  Future<void> createProfile({
+    required String profileId,
+    required EngineProfileMode mode,
+  });
+
+  /// Returns whether the engine accepts the supplied URI.
   bool canNavigate(Uri uri);
 
-  /// Clears only data that the current engine can safely scope.
+  /// Navigates the active engine profile to [uri].
+  Future<void> navigate(Uri uri);
+
+  /// Updates the user agent for the active profile.
+  Future<void> setUserAgent(String value);
+
+  /// Configures host-level content blocking for the active profile.
+  Future<void> setBlockedHosts(Iterable<String> hosts);
+
+  /// Clears browsing data belonging to the active profile.
+  Future<void> clearBrowsingData();
+
+  /// Clears private-session data when the active profile is private.
   Future<void> clearPrivateSession();
 
+  /// Releases native resources associated with the active profile/engine.
   Future<void> dispose();
+}
+
+/// Browser profile isolation mode.
+enum EngineProfileMode {
+  normal,
+  private;
+
+  bool get isPrivate => this == EngineProfileMode.private;
 }

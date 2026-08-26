@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../core/engine/browser_engine.dart';
 import '../../core/engine/native_engine.dart';
 import '../../core/features/v8_feature_registry.dart';
 import '../../services/downloads/download_manager.dart';
@@ -17,12 +18,12 @@ class V8BrowserCoordinator {
     DownloadManager? downloads,
     AdTrackerBlocker? blocker,
     CrashRecoveryService? recovery,
-  })  : engine = engine ?? NativeBrowserEngine(),
-        profiles = profiles ?? IncognitoProfileService(),
-        partitions = partitions ?? StoragePartitionService(),
-        downloads = downloads ?? DownloadManager(),
-        blocker = blocker ?? AdTrackerBlocker(),
-        recovery = recovery ?? CrashRecoveryService();
+  }) : engine = engine ?? NativeBrowserEngine(),
+       profiles = profiles ?? IncognitoProfileService(),
+       partitions = partitions ?? StoragePartitionService(),
+       downloads = downloads ?? DownloadManager(),
+       blocker = blocker ?? AdTrackerBlocker(),
+       recovery = recovery ?? CrashRecoveryService();
 
   final NativeBrowserEngine engine;
   final IncognitoProfileService profiles;
@@ -31,8 +32,9 @@ class V8BrowserCoordinator {
   final AdTrackerBlocker blocker;
   final CrashRecoveryService recovery;
 
-  late final NetworkRequestPolicy network =
-      NetworkRequestPolicy(blocker: blocker);
+  late final NetworkRequestPolicy network = NetworkRequestPolicy(
+    blocker: blocker,
+  );
 
   bool _started = false;
 
@@ -61,8 +63,14 @@ class V8BrowserCoordinator {
 
   Future<void> activateProfile(String profileId) async {
     final profile = profiles.get(profileId);
-    if (profile == null) throw StateError('Unknown browser profile: $profileId');
-    await engine.createProfile(profileId: profileId, mode: profile.isPrivate ? EngineProfileMode.private : EngineProfileMode.normal);
+    if (profile == null)
+      throw StateError('Unknown browser profile: $profileId');
+    await engine.createProfile(
+      profileId: profileId,
+      mode: profile.isPrivate
+          ? EngineProfileMode.private
+          : EngineProfileMode.normal,
+    );
   }
 
   Future<void> closeProfile(String profileId) async {
